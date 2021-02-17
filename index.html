@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+<head>
+
+<style>
+    
+table {
+    font-family: monospace ;
+    border-collapse: collapse;
+    width: 100%;
+}
+td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 9px;
+}
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+    
+	<p><h2>Hi! Click the button "Calculate" to display the duo worked together on same project(longest)</h2></p>
+
+
+
+<input type="file" name="file" id="file">
+
+<button onclick="myFunction()">Calculate</button>
+
+<table>
+	<tr>
+		<th>Employee ID #1</th>
+		<th>Employee ID #2</th>
+		<th>Project ID</th>	
+		<th>Worked days</th>
+		
+	</tr>
+	<tr>
+		<td id="user1"></td>
+		<td id="user2"></td>
+		<td id="projectID"></td>	
+		<td id="longest"></td>
+		
+
+	</tr>
+</table>
+
+<script>
+var project = []
+document.getElementById('file').onchange = function(){
+  project = [];
+  var file = this.files[0];
+ 
+  var reader = new FileReader();
+  reader.onload = function(progressEvent){
+    var lines = this.result.split('\n');
+	
+    for(var line = 0; line < lines.length; line++){
+		var info = lines[line].split(',');
+		project.push(info);
+	}
+	
+  };
+  reader.readAsText(file);
+};
+
+function myFunction() {
+
+
+var user1 = 0;
+var user2 = 0;
+var projectID = 0;
+
+
+var longest = 0;
+
+var mainTime = 0;
+
+
+var pastThrough = [];
+var sameTeam = [];
+var sameProject = 0;
+
+for (var x = 0; x < project.length; x++){
+
+  for (var y = 0; y < project.length; y++) {
+  
+    if (x != y){
+	
+      if (project[x][1] == project[y][1] && !pastThrough.includes(y)) {
+	  
+		    var nullTry1 = Date.parse(project[x][3]);
+		    var nullTry2 = Date.parse(project[y][3]);
+		
+		    if (isNaN(nullTry1)){
+			    project[x][3] = new Date();
+		    }
+		    if (isNaN(nullTry2)){
+		    	project[y][3] = new Date();
+		    }
+		    
+		    if (Date.parse(project[x][3]) >= Date.parse(project[y][2]) && Date.parse(project[x][2]) <= Date.parse(project[y][3])) {
+			
+			    var startDate1 = Date.parse(project[x][3]) - Date.parse(project[x][2]);
+			    var startDate2 = Date.parse(project[y][3]) - Date.parse(project[y][2]);
+			
+			
+			    if (Date.parse(project[x][2]) < Date.parse(project[y][2])) {
+			      	fromDate = project[y][2]
+			    } else {
+			      	fromDate = project[x][2]
+		    	}
+			    if (Date.parse(project[x][3]) < Date.parse(project[y][3])) {
+			      	toDate = project[x][3]
+		    	} else {
+			      	toDate = project[y][3]
+		    	}
+			if (sameTeam.includes(project[x][0]) && sameTeam.includes(project[y][0]) && sameProject == project[x][1]) {
+				if (startDate1 >  startDate2){
+					longest += startDate2
+				} else if (startDate2 >=  startDate1)  {
+					longest += startDate1
+				}
+				if (mainTime < longest) {
+					mainTime = longest
+					user1 = project[x][0]
+					user2 = project[y][0]
+					projectID = project[y][1];
+				
+				}
+			}
+			else {
+				if (startDate1 >  startDate2){
+					longest = startDate2
+					sameProject = project[x][1]
+					sameTeam = [];
+					sameTeam.push(project[x][0])
+					sameTeam.push(project[y][0])
+
+				} else if (startDate2 >=  startDate1)  {
+					longest = startDate1
+					sameProject = project[x][1]
+					sameTeam = [];
+					sameTeam.push(project[x][0])
+					sameTeam.push(project[y][0])
+
+				}
+				
+				if (mainTime < longest) {
+					mainTime = longest
+					user1 = project[x][0]
+					user2 = project[y][0]
+					projectID = project[y][1];
+					
+        			}
+				
+			}
+		}
+      }
+        pastThrough.push(x)
+    }
+  }
+}
+//Displaying details
+document.getElementById("user1").innerHTML = user1;
+document.getElementById("user2").innerHTML = user2;
+document.getElementById("projectID").innerHTML = projectID;
+document.getElementById("longest").innerHTML = Math.round(mainTime / 24 / 60 / 60 / 1000);
+}
+</script>
+
+</body>
+</html>
